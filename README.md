@@ -57,7 +57,7 @@ public class UploadDirToS3 {
             
             String relative = dirToUploadToS3.relativize(path).toString();
             
-            Path s3FileKey = Paths.get("s3ObjectKeyPrefix", relative);
+            Path s3FileKey = Paths.get(s3ObjectKeyPrefix, relative);
             
             System.out.println("Path: " + path + ", S3FileKey: " + s3FileKey);
             
