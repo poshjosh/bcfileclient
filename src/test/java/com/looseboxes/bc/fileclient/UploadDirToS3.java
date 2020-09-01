@@ -16,31 +16,35 @@ import java.util.concurrent.atomic.AtomicInteger;
 /**
  * @author hp
  */
-public class Main {
+public class UploadDirToS3 {
 
-    public static void main(String... args) {
+    public void upload(
+            String s3BucketName, String s3ObjectKeyPrefix,
+            String awsAccessKey, String awsSecretKey, 
+            Path dirToUploadToS3, int maxDepth) {
     
-        AWSCredentials credentials = new BasicAWSCredentials("<AWS_ACCESS_KEY>", "<AWS_SECRET_KEY>");
+        AWSCredentials awsCredentials = new BasicAWSCredentials(awsAccessKey, awsSecretKey);
         
-        AmazonS3Client client = new AmazonS3Client(credentials); 
+        AmazonS3Client s3Client = new AmazonS3Client(awsCredentials); 
      
-        Path dir = Paths.get(System.getProperty("user.home"), "Desktop", "buzzwears_local_images_downloaded_20200831", "images");
-        
         S3FileKeyBuilder s3FileKeyBuilder = (path) -> {
-            String relative = dir.relativize(path).toString();
-            Path s3FileKey = Paths.get("buzzwears", "public_html", "local", "images", relative);
+            
+            String relative = dirToUploadToS3.relativize(path).toString();
+            
+            Path s3FileKey = Paths.get("s3ObjectKeyPrefix", relative);
+            
             System.out.println("Path: " + path + ", S3FileKey: " + s3FileKey);
+            
             return s3FileKey.toString();
         };
         
-        AwsFileHandler fileHandler = new AwsFileHandler(
-                "<AWS_S3_BUCKET_NAME>", client, s3FileKeyBuilder);
+        AwsFileHandler fileHandler = new AwsFileHandler(s3BucketName, s3Client, s3FileKeyBuilder);
         
         try{
             
             AtomicInteger count = new AtomicInteger();
             
-            Files.walk(dir, 10)
+            Files.walk(dirToUploadToS3, maxDepth)
                     .forEach((path) -> {
                         if( ! Files.isDirectory(path)) {
 
@@ -68,8 +72,8 @@ public class Main {
             System.out.println("ATTEMPTED: " + count.get());
             
         }catch(IOException e) {
+            
             e.printStackTrace();
         }
-        
     }
 }
