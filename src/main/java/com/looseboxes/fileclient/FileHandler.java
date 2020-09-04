@@ -12,6 +12,10 @@ import java.nio.file.Path;
 public interface FileHandler {
 
     InputStream read(Path from) throws IOException;
+    
+    default Object readObject(Path from) throws IOException{
+        return Utils.deserialize(read(from));
+    }
 
     default void writeObject(Object obj, Path to) throws IOException{
         ByteArrayOutputStream out = new ByteArrayOutputStream(8 * 1024);
