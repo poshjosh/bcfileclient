@@ -4,6 +4,7 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.nio.file.Files;
 import java.nio.file.Path;
+import java.nio.file.StandardCopyOption;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -25,7 +26,8 @@ public class LocalFileHandler implements FileHandler{
     @Override
     public void write(InputStream in, Path to, long contentLength, String contentType) throws IOException {
         log.debug("Writing to local file: {}, content length: {}, type: {}", to, contentLength, contentType);
-        Files.copy(in, to);
+        // StandardCopyOption.ATOMIC_MOVE - Atomic move not supported
+        Files.copy(in, to, StandardCopyOption.REPLACE_EXISTING);
     }
 
     @Override

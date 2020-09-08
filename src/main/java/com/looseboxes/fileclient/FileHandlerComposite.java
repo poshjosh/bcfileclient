@@ -4,11 +4,15 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.nio.file.Path;
 import java.util.List;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 /**
  * @author hp
  */
 public class FileHandlerComposite implements FileHandler{
+    
+    private static final Logger LOG = LoggerFactory.getLogger(FileHandlerComposite.class);
     
     private final FileHandler [] delegates;
     
@@ -63,8 +67,8 @@ public class FileHandlerComposite implements FileHandler{
      * Only the result of the first successful write determines the state. 
      * Writes by subsequent delegates may be done asynchronously.
      * 
-     * @param in The {@link java.io.InputStream} containing the content to write
-     * @param to The Path to write to
+     * @param in The {@link java.io.InputStream} containing the content to writeSilently
+     * @param to The Path to writeSilently to
      * @param contentLength The content length
      * @param contentType The content type e.g image/jpeg
      * @throws IOException 
@@ -95,7 +99,7 @@ public class FileHandlerComposite implements FileHandler{
                 }
             }else{
                 
-                write(fileHandler, in, to, contentLength, contentType);
+                writeSilently(fileHandler, in, to, contentLength, contentType);
             }
         }
         
@@ -107,9 +111,13 @@ public class FileHandlerComposite implements FileHandler{
         }
     }
 
-    protected void write(FileHandler fileHandler, InputStream in, Path to, 
-            long contentLength, String contentType) throws IOException {
-        fileHandler.write(in, to, contentLength, contentType);
+    protected void writeSilently(FileHandler fileHandler, InputStream in, Path to, 
+            long contentLength, String contentType) {
+        try{
+            fileHandler.write(in, to, contentLength, contentType);
+        }catch(IOException e) {
+            LOG.warn("Failed to write to: " + to, e);
+        }
     }
     
     /**
@@ -118,8 +126,8 @@ public class FileHandlerComposite implements FileHandler{
      * Only the result of the first successful delete determines the state.
      * tWrites by subsequent delegates may be done asynchronously.
      * 
-     * @param path The path to delete
-     * @return true if the delete was successful
+     * @param path The path to deleteSilently
+     * @return true if the deleteSilently was successful
      * @throws IOException 
      */
     @Override
@@ -150,7 +158,7 @@ public class FileHandlerComposite implements FileHandler{
                 }
             }else{
                 
-                delete(fileHandler, path);
+                deleteSilently(fileHandler, path);
             }
         }
         
@@ -165,7 +173,12 @@ public class FileHandlerComposite implements FileHandler{
         return result;
     }
 
-    protected boolean delete(FileHandler fileHandler, Path path) throws IOException {
-        return fileHandler.delete(path);
+    protected boolean deleteSilently(FileHandler fileHandler, Path path) {
+        try{
+            return fileHandler.delete(path);
+        }catch(IOException e) {
+            LOG.warn("Problem deleting: " + path, e);
+            return false;
+        }
     }
 }
