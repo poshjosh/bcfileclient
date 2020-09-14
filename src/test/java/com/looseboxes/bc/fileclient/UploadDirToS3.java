@@ -35,7 +35,7 @@ public class UploadDirToS3 {
             
             System.out.println("Path: " + path + ", S3FileKey: " + s3FileKey);
             
-            return s3FileKey.toString();
+            return s3FileKey.toString().replace('\\', '/');
         };
         
         AwsFileHandler fileHandler = new AwsFileHandler(s3BucketName, s3Client, s3FileKeyBuilder);
