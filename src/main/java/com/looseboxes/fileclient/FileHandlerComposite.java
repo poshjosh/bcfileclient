@@ -124,7 +124,7 @@ public class FileHandlerComposite implements FileHandler{
      * Call the delete method all delegates. 
      * 
      * Only the result of the first successful delete determines the state.
-     * tWrites by subsequent delegates may be done asynchronously.
+     * Deletes by subsequent delegates may be done asynchronously.
      * 
      * @param path The path to deleteSilently
      * @return true if the deleteSilently was successful
