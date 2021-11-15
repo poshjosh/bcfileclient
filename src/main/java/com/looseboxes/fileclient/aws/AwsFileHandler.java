@@ -20,7 +20,7 @@ public class AwsFileHandler implements FileHandler{
     
     private final Logger log = LoggerFactory.getLogger(AwsFileHandler.class);
     
-    public static interface S3FileKeyBuilder{
+    public interface S3FileKeyBuilder{
         String from(Path path);
     }
     
